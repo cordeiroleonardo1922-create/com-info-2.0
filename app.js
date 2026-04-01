@@ -208,26 +208,136 @@ function updateLoginButtonState() {
 }
 
 // ============================================
-// TELA DE LOGIN - Botão Entrar
+// TELA DE LOGIN - Toggle de Senha + Validação Persistente
 // ============================================
+
+let loginError = false; // Flag global para manter o erro
+
+function setupPasswordToggle() {
+    const toggleButton = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password-input');
+
+    if (!toggleButton || !passwordInput) return;
+
+    // ✅ Estado inicial: senha oculta e ícone de olho fechado
+    AppState.passwordVisible = false;
+    passwordInput.type = 'password';
+    toggleButton.setAttribute('aria-label', 'Mostrar senha');
+    toggleButton.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+    `;
+
+    toggleButton.addEventListener('click', () => {
+        AppState.passwordVisible = !AppState.passwordVisible;
+
+        if (AppState.passwordVisible) {
+            // 🔓 Senha visível → ícone de olho aberto
+            passwordInput.type = 'text';
+            toggleButton.setAttribute('aria-label', 'Ocultar senha');
+            toggleButton.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            `;
+        } else {
+            // 🔒 Senha oculta → ícone de olho fechado
+            passwordInput.type = 'password';
+            toggleButton.setAttribute('aria-label', 'Mostrar senha');
+            toggleButton.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+            `;
+        }
+
+        // Mantém vermelho se login errado
+        if (loginError) toggleButton.classList.add('error');
+        else toggleButton.classList.remove('error');
+
+        passwordInput.focus();
+    });
+}
+
+function setupPasswordInput() {
+    const passwordInput = document.getElementById('password-input');
+    const loginButton = document.getElementById('login-button');
+
+    if (!passwordInput || !loginButton) return;
+
+    passwordInput.addEventListener('input', (e) => {
+        AppState.passwordValue = e.target.value.trim();
+        updateLoginButtonState();
+
+        // Só remove erro se o usuário acertou a senha
+        if (loginError && AppState.passwordValue === "cordeiro") {
+            loginError = false;
+            passwordInput.classList.remove('input-error');
+            document.getElementById('toggle-password').classList.remove('error');
+            document.getElementById('password-error').style.display = 'none';
+        }
+    });
+
+    passwordInput.addEventListener('blur', () => {
+        updateLoginButtonState();
+    });
+}
+
+function updateLoginButtonState() {
+    const loginButton = document.getElementById('login-button');
+    if (!loginButton) return;
+
+    const hasPassword = AppState.passwordValue.length >= 5;
+
+    if (hasPassword) {
+        loginButton.disabled = false;
+        loginButton.style.cursor = 'pointer';
+    } else {
+        loginButton.disabled = true;
+        loginButton.style.cursor = 'not-allowed';
+    }
+}
 
 function setupLoginButton() {
     const loginButton = document.getElementById('login-button');
+    const passwordInput = document.getElementById('password-input');
 
-    if (!loginButton) return;
+    if (!loginButton || !passwordInput) return;
+
+    // Cria span para mensagem de erro se não existir
+    let errorMsg = document.getElementById('password-error');
+    if (!errorMsg) {
+        errorMsg = document.createElement('span');
+        errorMsg.id = 'password-error';
+        errorMsg.className = 'password-error';
+        errorMsg.style.display = 'none';
+        passwordInput.parentNode.appendChild(errorMsg);
+    }
 
     loginButton.addEventListener('click', () => {
-        const passwordInput = document.getElementById('password-input');
         const senhaDigitada = passwordInput.value.trim();
-
         const senhaCorreta = "cordeiro"; // senha fixa
 
         if (senhaDigitada === senhaCorreta) {
-            // acesso liberado → vai pra próxima tela
+            // Limpa erro
+            loginError = false;
+            passwordInput.classList.remove('input-error');
+            document.getElementById('toggle-password').classList.remove('error');
+            errorMsg.style.display = 'none';
+
+            // Navega para a carteira
             showScreen('wallet');
         } else {
-            // erro
-            showToast('Senha incorreta');
+            // Mostra erro persistente
+            loginError = true;
+            passwordInput.classList.add('input-error');
+            document.getElementById('toggle-password').classList.add('error');
+            errorMsg.textContent = 'Senha incorreta';
+            errorMsg.style.display = 'block';
         }
     });
 }
