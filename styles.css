@@ -508,7 +508,8 @@ body {
 .rg-detail-content {
     flex: 1;
     padding: var(--spacing-lg) var(--spacing-md) calc(var(--tab-bar-height) + var(--spacing-md));
-    overflow-y: auto;
+    overflow: hidden;      /* bloqueia scroll */
+    touch-action: none;    /* bloqueia arrasto no iOS */
 }
 
 .rg-detail-panel {
