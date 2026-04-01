@@ -590,8 +590,8 @@ body {
 }
 
 .rg-qr-image {
-    width: 220px;
-    height: 220px;
+    width: 260px;
+    height: 260px;
     object-fit: contain;
 }
 
@@ -1635,7 +1635,7 @@ a,
 }
 
 .rg-signature img {
-    width: 220px;
+    width: 260px;
 }
 
 .rg-detail-panel {
@@ -1643,43 +1643,22 @@ a,
     flex-shrink: 0;
     transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
-/* ============================================
-   SCROLL LATERAL FLUIDO - RG DETAIL
-   ============================================ */
-
-.rg-detail-content {
-    scroll-behavior: smooth;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
-    cursor: grab;
-    transition: background-color 0.2s ease;
+/* Borda vermelha quando senha incorreta */
+.input-error {
+    border: 2px solid red !important;
 }
 
-.rg-detail-content:active {
-    cursor: grabbing;
+/* Mensagem de erro flutuante sobre o input (não empurra o botão) */
+.password-error {
+    color: rgb(224, 100, 100);
+    font-size: 0.8rem;
+    position: absolute;
+    top: 100%; /* logo abaixo do input */
+    left: 0;
+    margin-top: 2px;
+    display: none;
 }
-
-/* TRANSIÇÃO FLUIDA ENTRE ABAS */
-.rg-tab-button {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.rg-tab-button.active {
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* PAINEL COM TRANSIÇÃO SUAVE */
-.rg-detail-panel {
-    opacity: 0;
-    transform: translateX(20px);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none;
-}
-
-.rg-detail-panel.active {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
+#toggle-password.error svg {
+    stroke: red; /* deixa o ícone vermelho */
+    transition: stroke 0.2s ease;
 }
