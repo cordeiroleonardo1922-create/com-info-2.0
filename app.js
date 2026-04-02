@@ -336,7 +336,7 @@ function setupLoginButton() {
             loginError = true;
             passwordInput.classList.add('input-error');
             document.getElementById('toggle-password').classList.add('error');
-            errorMsg.textContent = 'Senha incorreta';
+            errorMsg.textContent = 'Senha incorreta.';
             errorMsg.style.display = 'block';
         }
     });
